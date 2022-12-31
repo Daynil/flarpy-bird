@@ -1,0 +1,6 @@
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/csharp-formatting-options
+[*]
+indent_style = tab
+trim_trailing_whitespace = true
+# This doesn't work with OmniSharp yet (tracking?)
+max_line_length = 80
