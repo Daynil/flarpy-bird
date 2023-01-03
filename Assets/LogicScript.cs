@@ -8,12 +8,15 @@ using Newtonsoft.Json;
 
 // https://www.youtube.com/watch?v=mntS45g8OK4
 // https://github.com/llamacademy/persistent-data/blob/main/Assets/Scripts/JSONDataService.cs
+
+// https://www.youtube.com/watch?v=aUi9aijvpgs
+// https://github.com/trevermock/save-load-system/tree/5-bug-fixes-and-polish
 class SaveData
 {
 	public List<int> HighScores;
 }
 
-public class LogicScript : MonoBehaviour
+public class LogicScript : MonoBehaviour, IDataPersist
 {
 	[SerializeField]
 	public int playerScore = 0;
@@ -31,7 +34,7 @@ public class LogicScript : MonoBehaviour
 
 	private void Start()
 	{
-		LoadSavedgame();
+		// LoadSavedgame();
 	}
 
 
@@ -56,43 +59,32 @@ public class LogicScript : MonoBehaviour
 	public void GameOver()
 	{
 		gameOverScreen.SetActive(true);
-		SaveGame(playerScore);
+		// SaveGame(playerScore);
 	}
 
-	public void SaveGame(int newScore)
+	public void LoadData(GameData data)
 	{
-		SaveData newSave = new SaveData
+		foreach (HighScore score in data.highScores)
 		{
-			HighScores = new List<int>
-			{
-				newScore
-			}
-		};
-
-		string saveJson = JsonConvert.SerializeObject(newSave);
-
-		File.WriteAllText(Application.persistentDataPath + "/saveData.json", saveJson);
-		Debug.Log("written to: " + Application.persistentDataPath);
-	}
-
-	public void LoadSavedgame()
-	{
-		if (File.Exists(Application.persistentDataPath + "/saveData.json"))
-		{
-			string existingData = File.ReadAllText(Application.persistentDataPath + "/saveData.json");
-			Debug.Log(existingData);
-			saveData = JsonConvert.DeserializeObject<SaveData>(existingData);
-			Debug.Log("Loaded save data: " + saveData);
+			Debug.Log(score.playerName + " : " + score.score);
 		}
-		else
+	}
+
+	public void SaveData(GameData data)
+	{
+		if (playerScore == 0) return;
+
+		if (playerScore > data.highScores[data.highScores.Count - 1].score)
 		{
-			saveData = new SaveData
+			for (int i = 0; i < data.highScores.Count; i++)
 			{
-				HighScores = new List<int> {
-					0
+				if (playerScore > data.highScores[i].score)
+				{
+					data.highScores.Insert(i, new() { playerName = "default", score = playerScore });
+					data.highScores.RemoveAt(data.highScores.Count - 1);
+					break;
 				}
-			};
-			Debug.Log("no save data yet");
+			}
 		}
 	}
 }
