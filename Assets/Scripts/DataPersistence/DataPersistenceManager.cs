@@ -4,7 +4,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// https://www.youtube.com/watch?v=mntS45g8OK4
+// https://github.com/llamacademy/persistent-data/blob/main/Assets/Scripts/JSONDataService.cs
 
+// https://www.youtube.com/watch?v=aUi9aijvpgs
+// https://github.com/trevermock/save-load-system/tree/5-bug-fixes-and-polish
 public class DataPersistenceManager : MonoBehaviour
 {
 	[SerializeField] private bool autosave = false;

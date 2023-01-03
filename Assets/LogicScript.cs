@@ -4,17 +4,6 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Newtonsoft.Json;
-
-// https://www.youtube.com/watch?v=mntS45g8OK4
-// https://github.com/llamacademy/persistent-data/blob/main/Assets/Scripts/JSONDataService.cs
-
-// https://www.youtube.com/watch?v=aUi9aijvpgs
-// https://github.com/trevermock/save-load-system/tree/5-bug-fixes-and-polish
-class SaveData
-{
-	public List<int> HighScores;
-}
 
 public class LogicScript : MonoBehaviour, IDataPersist
 {
@@ -22,8 +11,6 @@ public class LogicScript : MonoBehaviour, IDataPersist
 	public int playerScore = 0;
 	[SerializeField]
 	private Text scoreText;
-
-	private SaveData saveData;
 
 	[SerializeField]
 	private GameObject gameOverScreen;
