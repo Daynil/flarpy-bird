@@ -1,16 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class LogicScript : MonoBehaviour, IDataPersist
 {
 	[SerializeField]
 	public int playerScore = 0;
 	[SerializeField]
-	private Text scoreText;
+	private TMP_Text scoreText;
 
 	[SerializeField]
 	private GameObject gameOverScreen;
@@ -18,12 +19,29 @@ public class LogicScript : MonoBehaviour, IDataPersist
 	private GameObject startScreen;
 
 	public bool gameStarted = false;
+	public bool gameOver = false;
 
-	private void Start()
+	[SerializeField]
+	private GameObject highScoreScreen;
+	[SerializeField]
+	private TMP_Text highScore;
+
+	[SerializeField] private GameObject newHighScoreScreen;
+	[SerializeField] private TMP_Text scorePlace;
+	[SerializeField] private TMP_InputField scoreName;
+	[SerializeField] private TMP_Text nameError;
+
+	private List<HighScore> highScores;
+
+	private void OnEnable()
 	{
-		// LoadSavedgame();
+		ScoreTriggerScript.OnScorePoint += AddScore;
 	}
 
+	private void OnDisable()
+	{
+		ScoreTriggerScript.OnScorePoint -= AddScore;
+	}
 
 	[ContextMenu("Increase Score")]
 	public void AddScore(int scoreToAdd)
@@ -45,33 +63,96 @@ public class LogicScript : MonoBehaviour, IDataPersist
 
 	public void GameOver()
 	{
-		gameOverScreen.SetActive(true);
-		// SaveGame(playerScore);
+		if (gameOver) return;
+
+		gameOver = true;
+
+		if (playerScore > highScores[^1].score)
+		{
+			newHighScoreScreen.SetActive(true);
+			int highScorePlace = highScores.FindIndex(
+				score => score.score < playerScore
+			);
+			string suffix = "th";
+			switch (highScorePlace + 1)
+			{
+				case 1:
+					suffix = "st";
+					break;
+				case 2:
+					suffix = "nd";
+					break;
+				case 3:
+					suffix = "rd";
+					break;
+			}
+			scorePlace.text = $"{highScorePlace + 1}{suffix}";
+		}
+		else
+		{
+			gameOverScreen.SetActive(true);
+		}
+
+	}
+
+	public void DoneHighScoreName()
+	{
+		if (scoreName.text.Length == 0)
+		{
+			nameError.gameObject.SetActive(true);
+		}
+		else
+		{
+			int highScorePlace = highScores.FindIndex(
+				score => score.score < playerScore
+			);
+
+			highScores.Insert(
+				highScorePlace,
+				new() { playerName = scoreName.text, score = playerScore }
+			);
+			highScores.RemoveAt(highScores.Count - 1);
+
+			DataPersistenceManager.instance.SaveGame();
+			ShowHighScores();
+		}
+	}
+
+	public void NameEntry()
+	{
+		if (nameError.gameObject.activeSelf)
+		{
+			if (scoreName.text.Length > 0)
+			{
+				nameError.gameObject.SetActive(false);
+			}
+		}
+	}
+
+	public void ShowHighScores()
+	{
+		newHighScoreScreen.SetActive(false);
+		gameOverScreen.SetActive(false);
+		highScoreScreen.SetActive(true);
+
+		string highScoreText = "";
+
+		for (int i = 0; i < highScores.Count; i++)
+		{
+			if (i > 0) highScoreText += "<br>";
+			highScoreText += $"{i + 1}: {highScores[i].playerName}  {highScores[i].score}";
+		}
+
+		highScore.text = highScoreText;
 	}
 
 	public void LoadData(GameData data)
 	{
-		foreach (HighScore score in data.highScores)
-		{
-			Debug.Log(score.playerName + " : " + score.score);
-		}
+		highScores = data.highScores;
 	}
 
 	public void SaveData(GameData data)
 	{
-		if (playerScore == 0) return;
-
-		if (playerScore > data.highScores[data.highScores.Count - 1].score)
-		{
-			for (int i = 0; i < data.highScores.Count; i++)
-			{
-				if (playerScore > data.highScores[i].score)
-				{
-					data.highScores.Insert(i, new() { playerName = "default", score = playerScore });
-					data.highScores.RemoveAt(data.highScores.Count - 1);
-					break;
-				}
-			}
-		}
+		data.highScores = highScores;
 	}
 }

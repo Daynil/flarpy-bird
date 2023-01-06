@@ -14,14 +14,15 @@ public class GameData
 
 	public GameData()
 	{
+		string startNameLetters = "ABCDEFGHIJ";
 		lastPlayedTime = 0;
 		highScores = new List<HighScore>();
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < startNameLetters.Length; i++)
 		{
 			highScores.Add(new()
 			{
-				playerName = "default",
+				playerName = new string(startNameLetters[i], 3),
 				score = 0
 			});
 		}

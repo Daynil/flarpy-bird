@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class BirdScript : MonoBehaviour
 {
@@ -44,14 +45,6 @@ public class BirdScript : MonoBehaviour
 			animator.SetBool("gameStarted", true);
 
 		}
-
-		if (Input.GetKeyDown(KeyCode.Space) && birdIsAlive)
-		{
-			rigidBody.velocity = Vector2.up * flapStrength;
-			animator.Play("flap_once");
-			particle.Play();
-			audioSource.PlayOneShot(flap);
-		}
 	}
 
 	private void OnCollisionEnter2D(Collision2D collision)
@@ -59,5 +52,15 @@ public class BirdScript : MonoBehaviour
 		birdIsAlive = false;
 		audioSource.PlayOneShot(splat);
 		logic.GameOver();
+	}
+
+	void OnFire(InputValue value)
+	{
+		if (!birdIsAlive) return;
+
+		rigidBody.velocity = Vector2.up * flapStrength;
+		animator.Play("flap_once");
+		particle.Play();
+		audioSource.PlayOneShot(flap);
 	}
 }

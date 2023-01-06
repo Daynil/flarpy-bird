@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,8 @@ public class ScoreTriggerScript : MonoBehaviour
 	[SerializeField]
 	private AudioClip pointPing;
 
+	public static event Action<int> OnScorePoint;
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -21,10 +24,13 @@ public class ScoreTriggerScript : MonoBehaviour
 
 	void OnTriggerEnter2D(Collider2D collision)
 	{
+		if (logic.gameOver) return;
+
 		if (collision.gameObject.layer == 3)
 		{
 			audioSource.PlayOneShot(pointPing);
-			logic.AddScore(1);
+			OnScorePoint?.Invoke(1);
+			// logic.AddScore(1);
 		}
 	}
 }
