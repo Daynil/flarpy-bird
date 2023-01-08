@@ -61,6 +61,11 @@ public class LogicScript : MonoBehaviour, IDataPersist
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
 
+	public void ExitGame()
+	{
+		Application.Quit();
+	}
+
 	public void GameOver()
 	{
 		if (gameOver) return;
